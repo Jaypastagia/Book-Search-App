@@ -46,14 +46,11 @@ const calculateStatistics = (books) => {
 app.get("/api/search", async (req, res) => {
     const { query } = req.query;
     const start = Date.now();
-    console.log("Search API called");
     try {
         let apiURL = `https://postman-library-api.glitch.me/books`
         apiURL += query ? `?search=${query}` : '';
 
         const response = await axios.get(apiURL);
-
-        console.log(response.data);
         let books = response.data || [];
 
         books = books.map(data => {
@@ -66,9 +63,10 @@ app.get("/api/search", async (req, res) => {
 
         res.json({ books, statistics, serverResponseTime });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: "Failed to fetch books" });
     }
 });
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
+
+export default app;
