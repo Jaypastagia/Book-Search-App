@@ -12,6 +12,7 @@ const App = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [expandedDescriptions, setExpandedDescriptions] = useState({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const fetchBooks = async () => {
     setLoading(true);
@@ -25,7 +26,7 @@ const App = () => {
       setCurrentPage(0);
       setExpandedDescriptions({});
     } catch (error) {
-      console.error("Error fetching books:", error);
+      setError("Error fetching books");
     } finally {
       setLoading(false);
     }
@@ -101,57 +102,66 @@ const App = () => {
           <div className="flex justify-center items-center mt-8">
             <div className="loader border-t-4 border-b-4 border-cyan-600 rounded-full w-12 h-12 animate-spin"></div>
           </div>
+        ) : (error !== '' ? (
+          <div className="mt-6 text-center text-gray-500 text-lg">
+            Error fetching books
+          </div>
         ) : (
-          <>
-            {/* Book List */}
-            <ul className="mt-6 space-y-4">
-              {paginatedBooks.map((book, index) => {
-                const { author, title, description } = book || {};
-                const authorList = author ? author : "Unknown Author";
-                const isExpanded = expandedDescriptions[index];
-                const truncatedDescription = description
-                  ? description.slice(0, 100) + "..."
-                  : "No description available.";
-
-                return (
-                  <li
-                    key={index}
-                    className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
-                  >
-                    <div className="font-semibold">
-                      {authorList} - {title}
-                    </div>
-                    <p className="mt-2 text-sm text-gray-600">
-                      {isExpanded
-                        ? description || "No description available."
-                        : truncatedDescription}
-                    </p>
-                    {description && (
-                      <button
-                        onClick={() => handleToggleDescription(index)}
-                        className="mt-2 text-cyan-600 hover:underline text-sm"
-                      >
-                        {isExpanded ? "Show Less" : "Read More"}
-                      </button>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-
-            {/* Pagination */}
-            <div className="mt-6">
-              <ReactPaginate
-                previousLabel={"Previous"}
-                nextLabel={"Next"}
-                pageCount={Math.ceil(books.length / resultsPerPage)}
-                onPageChange={handlePageChange}
-                containerClassName="flex justify-center gap-2"
-                pageClassName="px-4 py-2 border rounded-lg"
-                activeClassName="bg-cyan-600 text-white"
-              />
+          books.length === 0 && !loading ? (
+            <div className="mt-6 text-center text-gray-500 text-lg">
+              No books available
             </div>
-          </>
+          ) : (
+            <>
+              <ul className="mt-6 space-y-4">
+                {
+                  paginatedBooks.map((book, index) => {
+                    const { author, title, description } = book || {};
+                    const authorList = author ? author : "Unknown Author";
+                    const isExpanded = expandedDescriptions[index];
+                    const truncatedDescription = description
+                      ? description.slice(0, 100) + "..."
+                      : "No description available.";
+
+                    return (
+                      <li
+                        key={index}
+                        className="bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition"
+                      >
+                        <div className="font-semibold">
+                          {authorList} - {title}
+                        </div>
+                        <p className="mt-2 text-sm text-gray-600">
+                          {isExpanded
+                            ? description || "No description available."
+                            : truncatedDescription}
+                        </p>
+                        {description && (
+                          <button
+                            onClick={() => handleToggleDescription(index)}
+                            className="mt-2 text-cyan-600 hover:underline text-sm"
+                          >
+                            {isExpanded ? "Show Less" : "Read More"}
+                          </button>
+                        )}
+                      </li>
+                    );
+                  })
+                }
+              </ul>
+              <div className="mt-6">
+                <ReactPaginate
+                  previousLabel={"Previous"}
+                  nextLabel={"Next"}
+                  pageCount={Math.ceil(books.length / resultsPerPage)}
+                  onPageChange={handlePageChange}
+                  containerClassName="flex justify-center gap-2"
+                  pageClassName="px-4 py-2 border rounded-lg"
+                  activeClassName="bg-cyan-600 text-white"
+                />
+              </div>
+            </>
+          ))
         )}
 
         {/* Statistics */}
@@ -164,7 +174,7 @@ const App = () => {
           <p>Server Response Time: {serverResponseTime}</p>
         </div>
       </main>
-    </div>
+    </div >
   );
 };
 
