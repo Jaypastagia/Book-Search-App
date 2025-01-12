@@ -2,13 +2,16 @@ import { expect } from 'chai';
 import supertest from 'supertest';
 import sinon from 'sinon';
 import axios from 'axios';
-import app from './server.js';  // Adjust this path to your server file
+import server from './server.js';
 
-// Supertest instance to make requests to the app
-const request = supertest(app);
+const request = supertest(server);
 
 describe('Book Search API', () => {
   let axiosGetStub;
+
+  after((done) => { 
+    server.close(done);
+  });
 
   beforeEach(() => {
     // Stub the axios.get method before each test
